@@ -28,11 +28,20 @@
  http://users.ece.utexas.edu/~valvano/
  */
 #include <stdint.h>
+#include <math.h>
 #include "PLL.h"
+#include "SysTickInts.h"
 #include "tm4c123gh6pm.h"
 
-// 20 kHz switching frequency
+#define PI (3.141592)
+#define PWM_SWITCHING_FREQUENCY (20000)
 #define PWM_PERIOD (250)
+#define PWM_RANGE ((((double) PWM_PERIOD) - 3) / 2)
+#define PWM_CENTER (PWM_RANGE + 3)
+#define TIMER_PERIOD (10000)
+#define TIMER_FREQUENCY (8000)
+
+uint32_t pwm_counter = 0;
 
 void PWM_Init() {
 	uint16_t period = PWM_PERIOD;
@@ -49,7 +58,7 @@ void PWM_Init() {
   GPIO_PORTB_DEN_R |= 0xD0;             // enable digital I/O on PB7-6
   SYSCTL_RCC_R |= SYSCTL_RCC_USEPWMDIV; // use PWM divider
   SYSCTL_RCC_R &= ~SYSCTL_RCC_PWMDIV_M; // clear PWM divider field
-  SYSCTL_RCC_R += SYSCTL_RCC_PWMDIV_16; // configure for /8 divider
+  SYSCTL_RCC_R += SYSCTL_RCC_PWMDIV_16; // configure for /16 divider
 
 	// Initialize PB6 and PB7 on PWM0
   PWM0_0_CTL_R = 0;                     // disable PWM while initializing
@@ -77,28 +86,44 @@ void PWM_Init() {
   PWM0_ENABLE_R |= PWM_ENABLE_PWM2EN;		// enable PB4/M0PWM1A is PWM2
 }
 
-void duty_a(uint16_t duty) {
+void set_duty_a(uint16_t duty) {
 	PWM0_0_CMPB_R = PWM_PERIOD - (duty - 1);
 }
 
-void duty_b(uint16_t duty) {
+void set_duty_b(uint16_t duty) {
 	PWM0_0_CMPA_R = PWM_PERIOD - (duty - 1);
 }
 
-void duty_c(uint16_t duty){
+void set_duty_c(uint16_t duty){
   PWM0_1_CMPA_R = PWM_PERIOD - (duty - 1);
 }
 
+void SysTick_Handler(void){
+	double frequency = 60;
+	double divisor = TIMER_FREQUENCY / frequency;
+	double phase = (((double) pwm_counter) / divisor) * 2 * PI;
+	double sine = cos(phase);
+	uint16_t duty_a = (uint16_t) (PWM_CENTER + (sine * PWM_RANGE));
+	
+	set_duty_a(duty_a);
+	
+	pwm_counter++;
+	if (pwm_counter > TIMER_FREQUENCY) {
+		pwm_counter = 0;
+	}
+}
+
 int main() {
-	duty_a(200);
-	duty_b(100);
-	duty_c(10);
+	set_duty_a(200);
+	set_duty_b(100);
+	set_duty_c(10);
 	while(1) {}
 }
 
 int SystemInit() {
 	PLL_Init();
 	PWM_Init();
+	SysTick_Init(TIMER_PERIOD);
 	
 	return 0;
 }
