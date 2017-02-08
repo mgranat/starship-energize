@@ -415,6 +415,26 @@
               <FileType>2</FileType>
               <FilePath>.\startup_TM4C123.s</FilePath>
             </File>
+            <File>
+              <FileName>PLL.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\PLL.c</FilePath>
+            </File>
+            <File>
+              <FileName>SysTickInts.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SysTickInts.c</FilePath>
+            </File>
+            <File>
+              <FileName>PLL.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\PLL.h</FilePath>
+            </File>
+            <File>
+              <FileName>SysTickInts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\SysTickInts.h</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
