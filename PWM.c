@@ -132,9 +132,15 @@ void set_duty_c(uint16_t duty){
   PWM0_2_CMPA_R = PWM_PERIOD - (duty - 1);
 }
 
-// 
+// Update range factor, limited to 0 <= f <= max
 void set_range_factor(double new_factor) {
-	range_factor = new_factor;
+	if (new_factor > RANGE_FACTOR_MAX) {
+		range_factor = RANGE_FACTOR_MAX;
+	} else if (new_factor < 0) {
+		range_factor = 0;
+	} else {
+		range_factor = new_factor;
+	}
 }
 
 // Advance duty cycles for all three phases

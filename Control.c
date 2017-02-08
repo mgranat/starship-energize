@@ -7,7 +7,9 @@
 #define TIMER_PERIOD (10000)
 #define TIMER_FREQUENCY (8000)
 
+// Called at TIMER_FREQUENCY
 void SysTick_Handler(void){
+	// Advance PWM phases
 	PWM_tick(TIMER_FREQUENCY, 60);
 }
 
