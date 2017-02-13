@@ -3,9 +3,12 @@
 // Use PB4, PB6, and PB7 to generate pulse-width modulated outputs.
 // Max Granat
 
-// PB6 PWM output A
-// PB7 PWM output B
-// PB4 PWM output C
+// Three phase PWM
+// Phase A+/- on PB6/7
+// Phase B+/- on PB4/5
+// Phase C+/- on PE4/5
+
+// Converter duty cycle on PC4
 
 /* This example accompanies the book
    "Embedded Systems: Real Time Interfacing to Arm Cortex M Microcontrollers",
@@ -143,12 +146,12 @@ void set_duty_a(uint16_t duty) {
 	PWM0_0_CMPA_R = PWM_PERIOD - (duty - 1);
 }
 
-// Set duty cycle for phase A
+// Set duty cycle for phase B
 void set_duty_b(uint16_t duty){
   PWM0_1_CMPA_R = PWM_PERIOD - (duty - 1);
 }
 
-// Set duty cycle for phase A
+// Set duty cycle for phase C
 void set_duty_c(uint16_t duty){
   PWM0_2_CMPA_R = PWM_PERIOD - (duty - 1);
 }
