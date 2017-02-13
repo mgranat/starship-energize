@@ -35,6 +35,7 @@
 #define PI (3.141592)
 #define PWM_DEAD_BAND (4)
 #define PWM_PERIOD (500) // 250 is 20 kHz switching frequency
+#define CONVERTER_PERIOD (250)
 #define PWM_PADDING (PWM_DEAD_BAND + 3)
 #define PWM_RANGE ((((double) PWM_PERIOD) - PWM_PADDING) / 2)
 #define PWM_CENTER (PWM_RANGE + PWM_PADDING)
@@ -116,6 +117,25 @@ void PWM_Init() {
   PWM0_2_CMPA_R = (PWM_PERIOD - 1)/2;   // count value when output rises
   PWM0_2_CTL_R |= PWM_2_CTL_ENABLE;     // start PWM2
   PWM0_ENABLE_R |= (PWM_ENABLE_PWM4EN|PWM_ENABLE_PWM5EN);	// enable PWM2
+	
+	// Initialize PC4 (converter duty cycle) on PWM3
+	SYSCTL_RCGCPWM_R |= 0x01;             // activate PWM0
+  SYSCTL_RCGCGPIO_R |= 0x04;            // activate port C
+  delay = SYSCTL_RCGCGPIO_R;            // allow time to finish activating
+  GPIO_PORTC_AFSEL_R |= 0x10;           // enable alt funct on PC4
+  GPIO_PORTC_PCTL_R &= ~0x000F0000;     // configure PC4 as PWM3
+  GPIO_PORTC_PCTL_R |= 0x00040000;
+  GPIO_PORTC_AMSEL_R &= ~0x10;          // disable analog functionality on PC4
+  GPIO_PORTC_DEN_R |= 0x10;             // enable digital I/O on PC4
+	
+	// Initialize PB6-7 on PWM0
+  PWM0_3_CTL_R = 0;                     // disable PWM while initializing
+  // PWM3, Generator A (PWM6/PC4) goes to 1 when count==reload and 0 when count==CMPA
+  PWM0_3_GENA_R = (PWM_3_GENA_ACTLOAD_ONE|PWM_3_GENA_ACTCMPAD_ZERO);
+  PWM0_3_LOAD_R = CONVERTER_PERIOD - 1;				// cycles needed to count down to 0
+  PWM0_3_CMPA_R = (CONVERTER_PERIOD-1)/2;   // count value when PWM3 toggles
+  PWM0_3_CTL_R |= PWM_3_CTL_ENABLE;			// start PWM3 in count down mode
+  PWM0_ENABLE_R |= PWM_ENABLE_PWM6EN;		// enable PWM3
 }
 
 // Set duty cycle for phase A
@@ -164,4 +184,14 @@ void PWM_tick(uint32_t timer_frequency, double motor_frequency){
 	if (pwm_counter > divisor) {
 		pwm_counter = 0;
 	}
+}
+
+void set_converter_duty(double duty) {
+	double duty_period = CONVERTER_PERIOD - (CONVERTER_PERIOD * duty);
+	if (duty_period < 3)
+		PWM0_3_CMPA_R = 3;
+	else if (duty_period >= CONVERTER_PERIOD - 1)
+		PWM0_3_CMPA_R = CONVERTER_PERIOD - 2;
+	else
+		PWM0_3_CMPA_R = (uint16_t) duty_period;
 }

@@ -14,6 +14,7 @@ void SysTick_Handler(void){
 }
 
 int main() {
+	set_converter_duty(.0001);
 	while(1) {}
 }
 
@@ -21,7 +22,6 @@ int SystemInit() {
 	PLL_Init();
 	PWM_Init();
 	SysTick_Init(TIMER_PERIOD);
-	
 	
 	return 0;
 }
