@@ -38,6 +38,7 @@
 #define PWM_PADDING (PWM_DEAD_BAND + 3)
 #define PWM_RANGE ((((double) PWM_PERIOD) - PWM_PADDING) / 2)
 #define PWM_CENTER (PWM_RANGE + PWM_PADDING)
+#define FREQUENCY_CORRECTION_FACTOR (1.08)
 #define RANGE_FACTOR_MAX (0.866)
 
 uint32_t pwm_counter = 0;
@@ -132,25 +133,25 @@ void set_duty_c(uint16_t duty){
   PWM0_2_CMPA_R = PWM_PERIOD - (duty - 1);
 }
 
-// Update range factor, limited to 0 <= f <= max
+// Update range factor, limited to 0 <= f <= 1
 void set_range_factor(double new_factor) {
-	if (new_factor > RANGE_FACTOR_MAX) {
+	if (new_factor > 1) {
 		range_factor = RANGE_FACTOR_MAX;
 	} else if (new_factor < 0) {
 		range_factor = 0;
 	} else {
-		range_factor = new_factor;
+		range_factor = new_factor * RANGE_FACTOR_MAX;
 	}
 }
 
 // Advance duty cycles for all three phases
 void PWM_tick(uint32_t timer_frequency, double motor_frequency){
-	double divisor = timer_frequency / (motor_frequency * 2);
+	double divisor = timer_frequency / (motor_frequency * 2 * FREQUENCY_CORRECTION_FACTOR);
 	double phase = (((double) pwm_counter) / divisor) * 2 * PI;
 	double offset = 2 * PI / 3;
 	double sine_a = cos(phase);
 	double sine_b = cos(phase + offset);
-	double sine_c = cos(phase - offset);
+	double sine_c = cos(phase + 2*offset);
 	uint16_t duty_a = (uint16_t) (PWM_CENTER + (sine_a * PWM_RANGE * range_factor));
 	uint16_t duty_b = (uint16_t) (PWM_CENTER + (sine_b * PWM_RANGE * range_factor));
 	uint16_t duty_c = (uint16_t) (PWM_CENTER + (sine_c * PWM_RANGE * range_factor));
@@ -160,7 +161,7 @@ void PWM_tick(uint32_t timer_frequency, double motor_frequency){
 	set_duty_c(duty_c);
 	
 	pwm_counter++;
-	if (pwm_counter > timer_frequency) {
+	if (pwm_counter > divisor) {
 		pwm_counter = 0;
 	}
 }

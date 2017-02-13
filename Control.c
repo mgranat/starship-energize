@@ -10,7 +10,7 @@
 // Called at TIMER_FREQUENCY
 void SysTick_Handler(void){
 	// Advance PWM phases
-	PWM_tick(TIMER_FREQUENCY, 60);
+	PWM_tick(TIMER_FREQUENCY, 30);
 }
 
 int main() {
@@ -21,6 +21,7 @@ int SystemInit() {
 	PLL_Init();
 	PWM_Init();
 	SysTick_Init(TIMER_PERIOD);
+	
 	
 	return 0;
 }
