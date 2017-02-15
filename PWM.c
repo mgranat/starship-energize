@@ -156,7 +156,7 @@ void set_duty_c(uint16_t duty){
   PWM0_2_CMPA_R = PWM_PERIOD - (duty - 1);
 }
 
-// Update range factor, limited to 0 <= f <= 1
+// Update range factor 0 <= f <= 1, factor of RANGE_FACTOR_MAX
 void set_range_factor(double new_factor) {
 	if (new_factor > 1) {
 		range_factor = RANGE_FACTOR_MAX;
@@ -189,6 +189,7 @@ void PWM_tick(uint32_t timer_frequency, double motor_frequency){
 	}
 }
 
+// Set converter duty cycle 0 <= d <= 1
 void set_converter_duty(double duty) {
 	double duty_period = CONVERTER_PERIOD - (CONVERTER_PERIOD * duty);
 	if (duty_period < 3)
