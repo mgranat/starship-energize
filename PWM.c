@@ -38,7 +38,7 @@
 #define PI (3.141592)
 #define PWM_DEAD_BAND (4)
 #define PWM_PERIOD (500) // 250 is 20 kHz switching frequency
-#define CONVERTER_PERIOD (250)
+#define CONVERTER_PERIOD (250) // 250 is 20 kHz switching frequency
 #define PWM_PADDING (PWM_DEAD_BAND + 3)
 #define PWM_RANGE ((((double) PWM_PERIOD) - PWM_PADDING) / 2)
 #define PWM_CENTER (PWM_RANGE + PWM_PADDING)
@@ -135,7 +135,7 @@ void PWM_Init() {
   PWM0_3_CTL_R = 0;                     // disable PWM while initializing
   // PWM3, Generator A (PWM6/PC4) goes to 1 when count==reload and 0 when count==CMPA
   PWM0_3_GENA_R = (PWM_3_GENA_ACTLOAD_ONE|PWM_3_GENA_ACTCMPAD_ZERO);
-  PWM0_3_LOAD_R = CONVERTER_PERIOD - 1;				// cycles needed to count down to 0
+  PWM0_3_LOAD_R = CONVERTER_PERIOD - 1;	// cycles needed to count down to 0
   PWM0_3_CMPA_R = (CONVERTER_PERIOD-1)/2;   // count value when PWM3 toggles
   PWM0_3_CTL_R |= PWM_3_CTL_ENABLE;			// start PWM3 in count down mode
   PWM0_ENABLE_R |= PWM_ENABLE_PWM6EN;		// enable PWM3
