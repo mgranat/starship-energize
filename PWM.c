@@ -55,8 +55,12 @@ double range_factor = RANGE_FACTOR_MAX;
 void PWM_Init() {
 	volatile uint32_t delay;
 	
-	// Initialize Port B
-  SYSCTL_RCGCPWM_R |= 0x01;             // activate PWM0
+	SYSCTL_RCGC0_R |= 0x00100000;
+	SYSCTL_RCGC2_R |= 0x22;
+
+	SYSCTL_RCGCPWM_R |= 0x03;             // activate PWM0-1
+
+	// Initialize Port B  
   SYSCTL_RCGCGPIO_R |= 0x02;            // activate port B
   delay = SYSCTL_RCGCGPIO_R;            // allow time to finish activating
   GPIO_PORTB_AFSEL_R |= 0xF0;           // enable alt funct on PB4-7
@@ -98,31 +102,30 @@ void PWM_Init() {
   PWM0_1_CTL_R |= PWM_1_CTL_ENABLE;     // start PWM1
   PWM0_ENABLE_R |= (PWM_ENABLE_PWM2EN|PWM_ENABLE_PWM3EN);		// enable PWM1
 	
-	// Initialize Port E
-	SYSCTL_RCGCGPIO_R |= 0x10;            // activate port E
+	// Initialize Port F
+	SYSCTL_RCGCGPIO_R |= 0x20;            // activate port F
   delay = SYSCTL_RCGCGPIO_R;            // allow time to finish activating
-  GPIO_PORTE_AFSEL_R |= 0x30;           // enable alt funct on PE4-5
-  GPIO_PORTE_PCTL_R &= ~0x00FF0000;     // configure PE4-5 as PWM0
-  GPIO_PORTE_PCTL_R |= 0x00440000;
-  GPIO_PORTE_AMSEL_R &= ~0x30;          // disable analog functionality on PE4-5
-  GPIO_PORTE_DEN_R |= 0x30;             // enable digital I/O on PE4-5
+  GPIO_PORTF_AFSEL_R |= 0x0C;           // enable alt funct on PF2-3
+  GPIO_PORTF_PCTL_R &= ~0xFF00;     		// configure PF2-3 as PWM3
+  GPIO_PORTF_PCTL_R |= 0x5500;
+  GPIO_PORTF_AMSEL_R &= ~0x0C;          // disable analog functionality on PF2-3
+  GPIO_PORTF_DEN_R |= 0x0C;             // enable digital I/O on PF2-3
 	
-	// Initialize PE4-5 on PWM2
-  PWM0_2_CTL_R = 0;                     // disable PWM while initializing
-	// PWM2, Generator A (PWM4/PE4) goes to 1 when count==reload and 0 when count==CMPA
-  PWM0_2_GENA_R = (PWM_2_GENA_ACTLOAD_ONE|PWM_2_GENA_ACTCMPAD_ZERO);
-	// PWM2, Generator B (PWM5/PE5) goes to 0 when count==reload and 1 when count==CMPA
-	PWM0_2_GENB_R = (PWM_2_GENB_ACTLOAD_ZERO|PWM_2_GENB_ACTCMPAD_ONE);
-	PWM0_2_DBCTL_R = 1;										// enable dead-band generator for PWM2
-	PWM0_2_DBRISE_R = PWM_DEAD_BAND;			// configure rising edge dead-band for PWM2
-	PWM0_2_DBFALL_R = PWM_DEAD_BAND;			// configure falling edge dead-band for PWM2
-  PWM0_2_LOAD_R = PWM_PERIOD - 1;       // cycles needed to count down to 0
-  PWM0_2_CMPA_R = (PWM_PERIOD - 1)/2;   // count value when output rises
-  PWM0_2_CTL_R |= PWM_2_CTL_ENABLE;     // start PWM2
-  PWM0_ENABLE_R |= (PWM_ENABLE_PWM4EN|PWM_ENABLE_PWM5EN);	// enable PWM2
+	// Initialize PF2-3 on PWM7
+  PWM1_3_CTL_R = 0;                     // disable PWM while initializing
+	// PWM3, Generator A (PWM6/PF2) goes to 1 when count==reload and 0 when count==CMPA
+  PWM1_3_GENA_R = (PWM_3_GENA_ACTLOAD_ONE|PWM_3_GENA_ACTCMPAD_ZERO);
+	// PWM3, Generator B (PWM7/PF3) goes to 0 when count==reload and 1 when count==CMPA
+	PWM1_3_GENB_R = (PWM_3_GENB_ACTLOAD_ZERO|PWM_3_GENB_ACTCMPAD_ONE);
+	PWM1_3_DBCTL_R = 1;										// enable dead-band generator for PWM3
+	PWM1_3_DBRISE_R = PWM_DEAD_BAND;			// configure rising edge dead-band for PWM3
+	PWM1_3_DBFALL_R = PWM_DEAD_BAND;			// configure falling edge dead-band for PWM3
+  PWM1_3_LOAD_R = PWM_PERIOD - 1;       // cycles needed to count down to 0
+  PWM1_3_CMPA_R = (PWM_PERIOD - 1)/2;   // count value when output rises
+  PWM1_3_CTL_R |= PWM_3_CTL_ENABLE;     // start PWM3
+  PWM1_ENABLE_R |= (PWM_ENABLE_PWM6EN|PWM_ENABLE_PWM7EN);	// enable PWM3
 	
 	// Initialize PC4 (converter duty cycle) on PWM3
-	SYSCTL_RCGCPWM_R |= 0x01;             // activate PWM0
   SYSCTL_RCGCGPIO_R |= 0x04;            // activate port C
   delay = SYSCTL_RCGCGPIO_R;            // allow time to finish activating
   GPIO_PORTC_AFSEL_R |= 0x10;           // enable alt funct on PC4
@@ -153,7 +156,7 @@ void set_duty_b(uint16_t duty){
 
 // Set duty cycle for phase C
 void set_duty_c(uint16_t duty){
-  PWM0_2_CMPA_R = PWM_PERIOD - (duty - 1);
+  PWM1_3_CMPA_R = PWM_PERIOD - (duty - 1);
 }
 
 // Update range factor 0 <= f <= 1, factor of RANGE_FACTOR_MAX
