@@ -46,7 +46,7 @@ void ADC_Init(void);
 	Input: value between 0 and 9 to choose which ADC to be returned, corresonds with AIN value
 	Output: 12-bit result of ADC conversion -- value between 0 and 4095
 	*/
-int ADC_In(int Ain);
+void ADC_In(int data[10]);
 
 
 
@@ -56,4 +56,4 @@ int ADC_In(int Ain);
 	Input: value between 0 and 9 to choose which ADC to be converted, corresponds with AIN value
 	Output: unsigned decimal value. Last 3 numbers are the tenths, hundredths, and thousandths values (to avoid floating point numbers)
 	*/
-int ADC_Calib (int Ain); 
+void ADC_Calib (int data[10]); 
