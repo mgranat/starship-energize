@@ -48,6 +48,9 @@ void ADC_Init(void);
 	*/
 void ADC_In(int data[10]);
 
+void ADC_In89(int data[2]);
+
+int ADC_In_Single(void);
 
 
 /***********ADC_Calib*************
