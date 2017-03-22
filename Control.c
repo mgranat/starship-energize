@@ -3,6 +3,7 @@
 
 #include "PLL.h"
 #include "PWM.h"
+#include "MotorControl.h"
 #include "SysTickInts.h"
 #include "ST7735.h"
 #include "Sensing.h"
@@ -23,8 +24,13 @@ void Delay10ms(uint32_t count){
 
 // Called at TIMER_FREQUENCY
 void SysTick_Handler(void){
-	// Advance PWM phases
-	PWM_tick(TIMER_FREQUENCY, 60);
+	// Motor Control
+	//double input_power = 20;																		// Read input power from sensing
+	//double voltage = calculate_voltage(input_power);						// Calculate V from P-V relationship
+	//double frequency = calculate_frequency(voltage);						// Calculate V
+	//double converter_duty = calculate_converter_duty(voltage);	// Calculate converter duty cycle
+	//set_converter_duty(converter_duty);													// Set converter duty cycle
+	PWM_tick(TIMER_FREQUENCY, 19.09);												// Advance PWM phases
 }
 
 int main() {
