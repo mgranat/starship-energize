@@ -34,28 +34,13 @@ void SysTick_Handler(void){
 }
 
 int main() {
-	int ADCdata[2] = {0} ;
+	int ADCdata[9] = {0} ;
 	//set_converter_duty(.0001);
-	ST7735_FillScreen(0x0000);
-	ST7735_SetCursor(0,0);
-	ST7735_OutString("ADC"); //19 characters each line max
-	ST7735_OutUDec(1);
-	ST7735_OutString(": ");
-	ST7735_SetCursor(0,1);
-	ST7735_OutString("ADC");
-	ST7735_OutUDec(2);
-	ST7735_OutString(": "); 
+	ADC_Print(ADCdata, 1); //setup the LCD for ADC raw data print
+	
 	while(1) {
-		ST7735_SetCursor(6,0);
-		ST7735_OutString("    ");
-		ST7735_SetCursor(6,0);
-		ADC_In89(ADCdata);
-		ST7735_OutUDec(ADCdata[1]);
-		ST7735_SetCursor(6,1);
-		ST7735_OutString("    ");
-		ST7735_SetCursor(6,1);
-		ADC_In89(ADCdata);
-		ST7735_OutUDec(ADCdata[0]);
+		ADC_In(ADCdata);
+		ADC_Print(ADCdata, 0);
 		Delay10ms(25);
 	}
 }

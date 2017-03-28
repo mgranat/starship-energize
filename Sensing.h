@@ -9,7 +9,7 @@
 	___________________
 	Total: 9 ADC pins
 		
-	Available pins for ADC: PE 0-5, PB 0-5 ---
+	Available pins for ADC: PE 0-5, PB 4-5, PD 0-3 ---
 		PB 4 5 taken by Max for PWM
 	
 	reference: page 801 of http://www.ti.com/lit/ds/spms376e/spms376e.pdf
@@ -43,20 +43,58 @@ void ADC_Init(void);
 
 /***********ADC_In****************
 	Busy-wait Analog to digital conversion
-	Input: value between 0 and 9 to choose which ADC to be returned, corresonds with AIN value
-	Output: 12-bit result of ADC conversion -- value between 0 and 4095
+	Input: 9 int array to store data in
+	Output: none
 	*/
-void ADC_In(int data[10]);
-
-void ADC_In89(int data[2]);
-
-int ADC_In_Single(void);
+void ADC_In(int data[9]);
 
 
 /***********ADC_Calib*************
-//return the values of the DC sensing data
-	Calibration for the ADC ports to convert ADC value (0-4095) to LCD display value
-	Input: value between 0 and 9 to choose which ADC to be converted, corresponds with AIN value
-	Output: unsigned decimal value. Last 3 numbers are the tenths, hundredths, and thousandths values (to avoid floating point numbers)
+	return the values of the DC sensing data
+	Calibration for the ADC ports to convert ADC value (0-4095) to analog value
+	Input: 1) value between 0 and 8 to index which ADC to be converted, chooses formula to convert with (switch statement)
+		   2) ADC data (0-4095) for corresponding value
+	Output: double with calculated value
 	*/
-void ADC_Calib (int data[10]); 
+double ADC_Calib (int data[9]); 
+
+/***********ADC_Print*************
+	print the raw ADC data 0-4095
+	if setup == 1 sets up screen with ADC data pairings if first / new screen printed to reduce flickering of all screen
+	else prints ADC values in the correct location (number starts in 6th location, in the indexed (ith) row)
+	Input: 9 int array with ADC data
+	Output: None
+	*/
+void ADC_Print(int data[9], int setup);
+
+/***********error*************
+	returns 1 if system has error
+	Error is defined as: ???? Consult team/Baldick for advice and definitions
+	Input: 9 int array with ADC data (calibrated)
+	Output: 0 if no error, 1 if error
+	*/
+int error (int data[9]);
+
+/***********getPvPower*************
+	returns voltage from the DC sensing side, DC Voltage * DC Current
+	Input: 9 int array with ADC data (calibrated)
+	Output: double value, no truncation
+	*/
+double getPvPower(int data[9]);
+
+/***********getAcPower*************
+	returns voltage from the AC sensing side 
+	= (AC Voltage1 * AC Current1 + AC Voltage2 * AC Current2 + AC Voltage3 * AC Current3)    //update formula, definitely incorrect
+	Input: 9 int array with ADC data (calibrated)
+	Output: double value, no truncation
+	*/
+double getAcPower(int data[9]);
+
+/***********getDcConverterVoltage*************
+	returns voltage from the DC converter side
+	Input: 9 int array with ADC data (calibrated)
+	Output: double value, no truncation
+	*/
+
+double getDcConverterVoltage(int data[9]);
+
