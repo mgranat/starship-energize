@@ -218,6 +218,15 @@ void ADC_Print(int setup){
 	Output: 0 if no error, 1 if error
 	*/
 int error (){																		//needs defining and then coding
+	// PV voltage significantly higher than rated
+	// PV current significantly higher than rated
+	// Output power significantly less than input power
+	// Output power significantly greater than input power
+	// Output power significantly greater than 220 V
+	// Output power significantly higher than inverter rating
+	// Converter voltage significantly less than PV voltage / 0.85
+	// Converter voltage significantly greater than PV voltage / 0.1
+	// Converter voltage significantly higher than rated
 	return 0;
 }
 
