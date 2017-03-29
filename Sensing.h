@@ -56,45 +56,52 @@ void ADC_In(int data[9]);
 		   2) ADC data (0-4095) for corresponding value
 	Output: double with calculated value
 	*/
-double ADC_Calib (int data[9]); 
+double ADC_Calib (); 
 
 /***********ADC_Print*************
 	print the raw ADC data 0-4095
 	if setup == 1 sets up screen with ADC data pairings if first / new screen printed to reduce flickering of all screen
 	else prints ADC values in the correct location (number starts in 6th location, in the indexed (ith) row)
-	Input: 9 int array with ADC data
-	Output: None
+	Input: a 0 or a 1 to decide if using setup mode or no
+	Output: none
 	*/
-void ADC_Print(int data[9], int setup);
+void ADC_Print(int setup);
 
 /***********error*************
 	returns 1 if system has error
 	Error is defined as: ???? Consult team/Baldick for advice and definitions
-	Input: 9 int array with ADC data (calibrated)
+	Input: none
 	Output: 0 if no error, 1 if error
 	*/
-int error (int data[9]);
+int error();
 
 /***********getPvPower*************
-	returns voltage from the DC sensing side, DC Voltage * DC Current
-	Input: 9 int array with ADC data (calibrated)
+	returns power from the PV sensing side, PV Voltage * DC Current
+	Input: none
 	Output: double value, no truncation
 	*/
-double getPvPower(int data[9]);
+double getPvPower();
+
+/***********getPvVoltage*************
+	returns voltage from the PV sensing side
+	Input: none
+	Output: double value, no truncation
+	*/
+double getPvVoltage();
 
 /***********getAcPower*************
-	returns voltage from the AC sensing side 
+	returns power from the AC sensing side 
 	= (AC Voltage1 * AC Current1 + AC Voltage2 * AC Current2 + AC Voltage3 * AC Current3)    //update formula, definitely incorrect
-	Input: 9 int array with ADC data (calibrated)
+	Input: none
 	Output: double value, no truncation
 	*/
-double getAcPower(int data[9]);
+double getAcPower();
 
 /***********getDcConverterVoltage*************
 	returns voltage from the DC converter side
-	Input: 9 int array with ADC data (calibrated)
+	Input: none
 	Output: double value, no truncation
 	*/
 
-double getDcConverterVoltage(int data[9]);
+double getDcConverterVoltage();
 
