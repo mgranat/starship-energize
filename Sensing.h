@@ -50,13 +50,12 @@ void ADC_In(int data[9]);
 
 
 /***********ADC_Calib*************
-	return the values of the DC sensing data
-	Calibration for the ADC ports to convert ADC value (0-4095) to analog value
+	return the analog equivelent values of the sensing data
+	Calibration for the ADC ports to convert ADC value (0-4095) to analog value (i.e 3.3V -> 4095 in ADC -> 220V returned)
 	Input: 1) value between 0 and 8 to index which ADC to be converted, chooses formula to convert with (switch statement)
-		   2) ADC data (0-4095) for corresponding value
 	Output: double with calculated value
 	*/
-double ADC_Calib (); 
+double ADC_Calib (int choice); 
 
 /***********ADC_Print*************
 	print the raw ADC data 0-4095
@@ -91,7 +90,7 @@ double getPvVoltage();
 
 /***********getAcPower*************
 	returns power from the AC sensing side 
-	= (AC Voltage1 * AC Current1 + AC Voltage2 * AC Current2 + AC Voltage3 * AC Current3)    //update formula, definitely incorrect
+	= (AC Voltage1 * AC Current1)*3  = active power assuming all 3 phases are working
 	Input: none
 	Output: double value, no truncation
 	*/

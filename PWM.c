@@ -6,7 +6,7 @@
 // Three phase PWM
 // Phase A+/- on PB6/7
 // Phase B+/- on PB4/5
-// Phase C+/- on PE4/5
+// Phase C+/- on PF2/3
 
 // Converter duty cycle on PC4
 

@@ -110,13 +110,48 @@ void ADC_In(int data[9]){
 
 
 /***********ADC_Calib*************
-	return the values of the DC sensing data
-	Calibration for the ADC ports to convert ADC value (0-4095) to LCD display value
-	Input: none
-	Output: unsigned decimal value. Last 3 numbers are the tenths, hundredths, and thousandths values (to avoid floating point numbers)
+	return the analog equivelent values of the sensing data
+	Calibration for the ADC ports to convert ADC value (0-4095) to analog value (i.e 3.3V -> 4095 in ADC -> 220V returned)
+	Input: 1) value between 0 and 8 to index which ADC to be converted, chooses formula to convert with (switch statement)
+	Output: double with calculated value
 	*/
-void ADC_Calib (int data[9]){
-	return;
+double ADC_Calib (int choice){
+	double retValue = 0;
+	int tempData = 0;
+	int data[9] = {0};
+	ADC_In(data);
+	tempData = data[choice];
+	
+	switch(choice){
+		case 0: //AIN9, b-leg AC voltage on PE4
+			ST7735_OutUDec(9);							//ignore this for now, will need to experimentally calibrate then format to linear data then formula then implement
+			break;
+		case 1: //AIN0, a-leg AC voltage on PE3
+			ST7735_OutUDec(0);
+			break;
+		case 2: //AIN1, DC-DC voltage on PE2
+			ST7735_OutUDec(1);
+			break;
+		case 3: //AIN2, PV-DC current on PE1
+			ST7735_OutUDec(2);
+			break;
+		case 4: //AIN3, PV-DC voltage on PE0
+			ST7735_OutUDec(3);
+			break;
+		case 5: //AIN5, c-leg AC current on PD2
+			ST7735_OutUDec(5);
+			break;
+		case 6: //AIN6, b-leg AC current on PD1
+			ST7735_OutUDec(6);
+			break;
+		case 7: //AIN7, a-leg AC current on PD0
+			ST7735_OutUDec(7);
+			break;
+		case 8: //AIN8, c-leg AC voltage on PE5
+			ST7735_OutUDec(8);
+			break;
+	}
+	return retValue;
 }
 
 /***********ADC_Print*************
@@ -126,7 +161,9 @@ void ADC_Calib (int data[9]){
 	Input: 9 int array with ADC data
 	Output: None
 	*/
-void ADC_Print(int data[9], int setup){
+void ADC_Print(int setup){
+	int data[9] = {0};
+	ADC_In(data);
 	if(setup==1){
 		ST7735_FillScreen(0x0000);
 		for(int i=0; i<9; i++){
@@ -163,7 +200,7 @@ void ADC_Print(int data[9], int setup){
 			}
 			ST7735_OutString(": ");
 		}
-	}
+	} //end setup == 1
 	else{
 		for(int i=0; i<9; i++){
 				ST7735_SetCursor(6,i);
@@ -172,7 +209,6 @@ void ADC_Print(int data[9], int setup){
 				ST7735_OutUDec(data[i]);
 		}
 	}
-	return;
 }
 
 /***********error*************
@@ -181,27 +217,36 @@ void ADC_Print(int data[9], int setup){
 	Input: 9 int array with ADC data (calibrated)
 	Output: 0 if no error, 1 if error
 	*/
-int error (int data[9]){
+int error (){																		//needs defining and then coding
 	return 0;
 }
 
 /***********getPvPower*************
-	returns voltage from the DC sensing side, DC Voltage * DC Current
+	returns power from the DC sensing side, DC Voltage * DC Current
 	Input: 9 int array with ADC data (calibrated)
 	Output: double value, no truncation
 	*/
-double getPvPower(int data[9]){
-	return 0;
+double getPvPower(){
+	return ADC_Calib(4) * ADC_Calib(3);
+}
+
+/***********getPvVoltage*************
+	returns voltage from the PV sensing side
+	Input: none
+	Output: double value, no truncation
+	*/
+double getPvVoltage(){
+	return ADC_Calib(4);
 }
 
 /***********getAcPower*************
-	returns voltage from the AC sensing side 
-	= (AC Voltage1 * AC Current1 + AC Voltage2 * AC Current2 + AC Voltage3 * AC Current3)    //update formula, definitely incorrect
+	returns power from the AC sensing side 
+	= (AC Voltage1 * AC Current1)*3 = active power assuming all three phases are working
 	Input: 9 int array with ADC data (calibrated)
 	Output: double value, no truncation
 	*/
-double getAcPower(int data[9]){
-	return 0;
+double getAcPower(){
+	return ADC_Calib(1) * ADC_Calib(7);
 }
 
 /***********getDcConverterVoltage*************
@@ -210,7 +255,7 @@ double getAcPower(int data[9]){
 	Output: double value, no truncation
 	*/
 
-double getDcConverterVoltage(int data[9]){
-	return 0;
+double getDcConverterVoltage(){
+	return ADC_Calib(2);
 }
 

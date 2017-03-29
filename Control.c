@@ -34,13 +34,12 @@ void SysTick_Handler(void){
 }
 
 int main() {
-	int ADCdata[9] = {0} ;
+	int ADCdata[9] = {0};
 	//set_converter_duty(.0001);
-	ADC_Print(ADCdata, 1); //setup the LCD for ADC raw data print
+	ADC_Print(1); //setup the LCD for ADC raw data print
 	
 	while(1) {
-		ADC_In(ADCdata);
-		ADC_Print(ADCdata, 0);
+		ADC_Print(0);
 		Delay10ms(25);
 	}
 }
