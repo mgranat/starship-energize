@@ -1,13 +1,27 @@
 #include <stdint.h>
+#include <stdio.h>
 
 #include "PLL.h"
 #include "PWM.h"
 #include "MotorControl.h"
 #include "SysTickInts.h"
+#include "ST7735.h"
+#include "Sensing.h"
 
 #define TIMER_PERIOD_K (10)
 #define TIMER_PERIOD (TIMER_PERIOD_K * 1000)
 #define TIMER_FREQUENCY (80000 / TIMER_PERIOD_K)
+
+void Delay10ms(uint32_t count){
+	uint32_t volatile time;
+  while(count>0){
+    time = 72724;  // 0.01sec at 80 MHz
+    while(time){
+	  	time--;
+    }
+    count--;
+  }
+}
 
 // Motor control loop
 void SysTick_Handler(void){
@@ -46,13 +60,27 @@ void SysTick_Handler(void){
 }
 
 int main() {
-	while(1) {}
+	// while(1) {}
+	int ADCdata[9] = {0} ;
+	//set_converter_duty(.0001);
+	ADC_Print( 1); //setup the LCD for ADC raw data print
+	
+	while(1) {
+		ADC_Print(0);
+		Delay10ms(25);
+	}
 }
 
 int SystemInit() {
 	PLL_Init();
-	PWM_Init();
-	SysTick_Init(TIMER_PERIOD);
+	ADC_Init();
+	ST7735_InitR(INITR_REDTAB);
+	
+	//PWM_Init();
+	//SysTick_Init(TIMER_PERIOD); //-- this breaks my LCD printing out ever. Cant output more than 10 pixels before it crashes. Doesn't ever return. Possible Hard Fault
+								//LCD seems to work otherwise
+	
 	
 	return 0;
 }
+

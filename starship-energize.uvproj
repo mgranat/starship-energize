@@ -406,6 +406,11 @@
           <GroupName>Source Code</GroupName>
           <Files>
             <File>
+              <FileName>LCD.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\LCD.s</FilePath>
+            </File>
+            <File>
               <FileName>PWM.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\PWM.c</FilePath>
@@ -454,6 +459,16 @@
               <FileName>Sensing.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Sensing.h</FilePath>
+            </File>
+            <File>
+              <FileName>Sensing.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sensing.c</FilePath>
+            </File>
+            <File>
+              <FileName>ST7735.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\ST7735.c</FilePath>
             </File>
           </Files>
         </Group>
