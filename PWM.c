@@ -51,97 +51,99 @@ double range_factor = RANGE_FACTOR_MAX;
 // Initialize PWM modules
 // Phase A+/- on PB6/7
 // Phase B+/- on PB4/5
-// Phase C+/- on PE4/5
+// Phase C+/- on PF2/3
 void PWM_Init() {
 	volatile uint32_t delay;
-	
-	SYSCTL_RCGC0_R |= 0x00100000;
-	SYSCTL_RCGC2_R |= 0x22;
 
 	SYSCTL_RCGCPWM_R |= 0x03;             // activate PWM0-1
+	delay = SYSCTL_RCGCPWM_R;            // allow time to finish activating
+	delay = SYSCTL_RCGCPWM_R;
 
 	// Initialize Port B  
-  SYSCTL_RCGCGPIO_R |= 0x02;            // activate port B
-  delay = SYSCTL_RCGCGPIO_R;            // allow time to finish activating
-  GPIO_PORTB_AFSEL_R |= 0xF0;           // enable alt funct on PB4-7
-  GPIO_PORTB_PCTL_R &= ~0xFFFF0000;     // configure PB4-7 as PWM0
-  GPIO_PORTB_PCTL_R |= 0x44440000;
-  GPIO_PORTB_AMSEL_R &= ~0xF0;          // disable analog functionality on PB4-7
-  GPIO_PORTB_DEN_R |= 0xF0;             // enable digital I/O on PB4-7
+	SYSCTL_RCGCGPIO_R |= 0x02;            // activate port B
+	delay = SYSCTL_RCGCGPIO_R;            // allow time to finish activating
+	delay = SYSCTL_RCGCGPIO_R;
+	GPIO_PORTB_AFSEL_R |= 0xF0;           // enable alt funct on PB4-7
+	GPIO_PORTB_PCTL_R &= ~0xFFFF0000;     // configure PB4-7 as PWM0
+	GPIO_PORTB_PCTL_R |= 0x44440000;
+	GPIO_PORTB_AMSEL_R &= ~0xF0;          // disable analog functionality on PB4-7
+	GPIO_PORTB_DEN_R |= 0xF0;             // enable digital I/O on PB4-7
 
 	// Set up PWM divider
-  SYSCTL_RCC_R |= SYSCTL_RCC_USEPWMDIV; // use PWM divider
-  SYSCTL_RCC_R &= ~SYSCTL_RCC_PWMDIV_M; // clear PWM divider field
-  SYSCTL_RCC_R += SYSCTL_RCC_PWMDIV_16; // configure for /16 divider
+	SYSCTL_RCC_R |= SYSCTL_RCC_USEPWMDIV; // use PWM divider
+	SYSCTL_RCC_R &= ~SYSCTL_RCC_PWMDIV_M; // clear PWM divider field
+	SYSCTL_RCC_R += SYSCTL_RCC_PWMDIV_16; // configure for /16 divider
 
 	// Initialize PB6-7 on PWM0
-  PWM0_0_CTL_R = 0;                     // disable PWM while initializing
-  // PWM0, Generator A (PWM0/PB6) goes to 1 when count==reload and 0 when count==CMPA
-  PWM0_0_GENA_R = (PWM_0_GENA_ACTLOAD_ONE|PWM_0_GENA_ACTCMPAD_ZERO);
-  // PWM0, Generator B (PWM1/PB7) goes to 0 when count==reload and 1 when count==CMPA
-  PWM0_0_GENB_R = (PWM_0_GENB_ACTLOAD_ZERO|PWM_0_GENB_ACTCMPAD_ONE);
+	PWM0_0_CTL_R = 0;                     // disable PWM while initializing
+	// PWM0, Generator A (PWM0/PB6) goes to 1 when count==reload and 0 when count==CMPA
+	PWM0_0_GENA_R = (PWM_0_GENA_ACTLOAD_ONE|PWM_0_GENA_ACTCMPAD_ZERO);
+	// PWM0, Generator B (PWM1/PB7) goes to 0 when count==reload and 1 when count==CMPA
+	PWM0_0_GENB_R = (PWM_0_GENB_ACTLOAD_ZERO|PWM_0_GENB_ACTCMPAD_ONE);
 	PWM0_0_DBCTL_R = 1;										// enable dead-band generator for PWM0
 	PWM0_0_DBRISE_R = PWM_DEAD_BAND;			// configure rising edge dead-band for PWM0
 	PWM0_0_DBFALL_R = PWM_DEAD_BAND;			// configure falling edge dead-band for PWM0
-  PWM0_0_LOAD_R = PWM_PERIOD - 1;				// cycles needed to count down to 0
-  PWM0_0_CMPA_R = (PWM_PERIOD - 1)/2;   // count value when PWM0 toggles
-  PWM0_0_CTL_R |= PWM_0_CTL_ENABLE;			// start PWM0 in count down mode
-  PWM0_ENABLE_R |= (PWM_ENABLE_PWM0EN|PWM_ENABLE_PWM1EN);		// enable PWM0
-	
+	PWM0_0_LOAD_R = PWM_PERIOD - 1;				// cycles needed to count down to 0
+	PWM0_0_CMPA_R = (PWM_PERIOD - 1)/2;   // count value when PWM0 toggles
+	PWM0_0_CTL_R |= PWM_0_CTL_ENABLE;			// start PWM0 in count down mode
+	PWM0_ENABLE_R |= (PWM_ENABLE_PWM0EN|PWM_ENABLE_PWM1EN);		// enable PWM0
+
 	// Initialize PB4-5 on PWM1
-  PWM0_1_CTL_R = 0;                     // disable PWM while initializing
+	PWM0_1_CTL_R = 0;                     // disable PWM while initializing
 	// PWM1, Generator A (PWM2/PB4) goes to 1 when count==reload and 0 when count==CMPA
-  PWM0_1_GENA_R = (PWM_1_GENA_ACTLOAD_ONE|PWM_1_GENA_ACTCMPAD_ZERO);
+	PWM0_1_GENA_R = (PWM_1_GENA_ACTLOAD_ONE|PWM_1_GENA_ACTCMPAD_ZERO);
 	// PWM1, Generator B (PWM3/PB5) goes to 0 when count==reload and 1 when count==CMPA
 	PWM0_1_GENB_R = (PWM_1_GENB_ACTLOAD_ZERO|PWM_1_GENB_ACTCMPAD_ONE);
 	PWM0_1_DBCTL_R = 1;										// enable dead-band generator for PWM1
 	PWM0_1_DBRISE_R = PWM_DEAD_BAND;			// configure rising edge dead-band for PWM1
 	PWM0_1_DBFALL_R = PWM_DEAD_BAND;			// configure falling edge dead-band for PWM1
-  PWM0_1_LOAD_R = PWM_PERIOD - 1;       // cycles needed to count down to 0
-  PWM0_1_CMPA_R = (PWM_PERIOD - 1)/2;   // count value when PWM1 toggles
-  PWM0_1_CTL_R |= PWM_1_CTL_ENABLE;     // start PWM1
-  PWM0_ENABLE_R |= (PWM_ENABLE_PWM2EN|PWM_ENABLE_PWM3EN);		// enable PWM1
-	
+	PWM0_1_LOAD_R = PWM_PERIOD - 1;       // cycles needed to count down to 0
+	PWM0_1_CMPA_R = (PWM_PERIOD - 1)/2;   // count value when PWM1 toggles
+	PWM0_1_CTL_R |= PWM_1_CTL_ENABLE;     // start PWM1
+	PWM0_ENABLE_R |= (PWM_ENABLE_PWM2EN|PWM_ENABLE_PWM3EN);		// enable PWM1
+
 	// Initialize Port F
 	SYSCTL_RCGCGPIO_R |= 0x20;            // activate port F
-  delay = SYSCTL_RCGCGPIO_R;            // allow time to finish activating
-  GPIO_PORTF_AFSEL_R |= 0x0C;           // enable alt funct on PF2-3
-  GPIO_PORTF_PCTL_R &= ~0xFF00;     		// configure PF2-3 as PWM3
-  GPIO_PORTF_PCTL_R |= 0x5500;
-  GPIO_PORTF_AMSEL_R &= ~0x0C;          // disable analog functionality on PF2-3
-  GPIO_PORTF_DEN_R |= 0x0C;             // enable digital I/O on PF2-3
-	
+	delay = SYSCTL_RCGCGPIO_R;            // allow time to finish activating
+	delay = SYSCTL_RCGCGPIO_R;
+	GPIO_PORTF_AFSEL_R |= 0x0C;           // enable alt funct on PF2-3
+	GPIO_PORTF_PCTL_R &= ~0xFF00;     		// configure PF2-3 as PWM3
+	GPIO_PORTF_PCTL_R |= 0x5500;
+	GPIO_PORTF_AMSEL_R &= ~0x0C;          // disable analog functionality on PF2-3
+	GPIO_PORTF_DEN_R |= 0x0C;             // enable digital I/O on PF2-3
+
 	// Initialize PF2-3 on PWM7
-  PWM1_3_CTL_R = 0;                     // disable PWM while initializing
+	PWM1_3_CTL_R = 0;                     // disable PWM while initializing
 	// PWM3, Generator A (PWM6/PF2) goes to 1 when count==reload and 0 when count==CMPA
-  PWM1_3_GENA_R = (PWM_3_GENA_ACTLOAD_ONE|PWM_3_GENA_ACTCMPAD_ZERO);
+	PWM1_3_GENA_R = (PWM_3_GENA_ACTLOAD_ONE|PWM_3_GENA_ACTCMPAD_ZERO);
 	// PWM3, Generator B (PWM7/PF3) goes to 0 when count==reload and 1 when count==CMPA
 	PWM1_3_GENB_R = (PWM_3_GENB_ACTLOAD_ZERO|PWM_3_GENB_ACTCMPAD_ONE);
 	PWM1_3_DBCTL_R = 1;										// enable dead-band generator for PWM3
 	PWM1_3_DBRISE_R = PWM_DEAD_BAND;			// configure rising edge dead-band for PWM3
 	PWM1_3_DBFALL_R = PWM_DEAD_BAND;			// configure falling edge dead-band for PWM3
-  PWM1_3_LOAD_R = PWM_PERIOD - 1;       // cycles needed to count down to 0
-  PWM1_3_CMPA_R = (PWM_PERIOD - 1)/2;   // count value when output rises
-  PWM1_3_CTL_R |= PWM_3_CTL_ENABLE;     // start PWM3
-  PWM1_ENABLE_R |= (PWM_ENABLE_PWM6EN|PWM_ENABLE_PWM7EN);	// enable PWM3
-	
+	PWM1_3_LOAD_R = PWM_PERIOD - 1;       // cycles needed to count down to 0
+	PWM1_3_CMPA_R = (PWM_PERIOD - 1)/2;   // count value when output rises
+	PWM1_3_CTL_R |= PWM_3_CTL_ENABLE;     // start PWM3
+	PWM1_ENABLE_R |= (PWM_ENABLE_PWM6EN|PWM_ENABLE_PWM7EN);	// enable PWM3
+
 	// Initialize PC4 (converter duty cycle) on PWM3
-  SYSCTL_RCGCGPIO_R |= 0x04;            // activate port C
-  delay = SYSCTL_RCGCGPIO_R;            // allow time to finish activating
-  GPIO_PORTC_AFSEL_R |= 0x10;           // enable alt funct on PC4
-  GPIO_PORTC_PCTL_R &= ~0x000F0000;     // configure PC4 as PWM3
-  GPIO_PORTC_PCTL_R |= 0x00040000;
-  GPIO_PORTC_AMSEL_R &= ~0x10;          // disable analog functionality on PC4
-  GPIO_PORTC_DEN_R |= 0x10;             // enable digital I/O on PC4
-	
+	SYSCTL_RCGCGPIO_R |= 0x04;            // activate port C
+	delay = SYSCTL_RCGCGPIO_R;            // allow time to finish activating
+	delay = SYSCTL_RCGCGPIO_R;
+	GPIO_PORTC_AFSEL_R |= 0x10;           // enable alt funct on PC4
+	GPIO_PORTC_PCTL_R &= ~0x000F0000;     // configure PC4 as PWM3
+	GPIO_PORTC_PCTL_R |= 0x00040000;
+	GPIO_PORTC_AMSEL_R &= ~0x10;          // disable analog functionality on PC4
+	GPIO_PORTC_DEN_R |= 0x10;             // enable digital I/O on PC4
+
 	// Initialize PB6-7 on PWM0
-  PWM0_3_CTL_R = 0;                     // disable PWM while initializing
-  // PWM3, Generator A (PWM6/PC4) goes to 1 when count==reload and 0 when count==CMPA
-  PWM0_3_GENA_R = (PWM_3_GENA_ACTLOAD_ONE|PWM_3_GENA_ACTCMPAD_ZERO);
-  PWM0_3_LOAD_R = CONVERTER_PERIOD - 1;	// cycles needed to count down to 0
-  PWM0_3_CMPA_R = (CONVERTER_PERIOD-1)/2;   // count value when PWM3 toggles
-  PWM0_3_CTL_R |= PWM_3_CTL_ENABLE;			// start PWM3 in count down mode
-  PWM0_ENABLE_R |= PWM_ENABLE_PWM6EN;		// enable PWM3
+	PWM0_3_CTL_R = 0;                     // disable PWM while initializing
+	// PWM3, Generator A (PWM6/PC4) goes to 1 when count==reload and 0 when count==CMPA
+	PWM0_3_GENA_R = (PWM_3_GENA_ACTLOAD_ONE|PWM_3_GENA_ACTCMPAD_ZERO);
+	PWM0_3_LOAD_R = CONVERTER_PERIOD - 1;	// cycles needed to count down to 0
+	PWM0_3_CMPA_R = (CONVERTER_PERIOD-1)/2;   // count value when PWM3 toggles
+	PWM0_3_CTL_R |= PWM_3_CTL_ENABLE;			// start PWM3 in count down mode
+	PWM0_ENABLE_R |= PWM_ENABLE_PWM6EN;		// enable PWM3
 }
 
 // Set duty cycle for phase A
@@ -151,12 +153,12 @@ void set_duty_a(uint16_t duty) {
 
 // Set duty cycle for phase B
 void set_duty_b(uint16_t duty){
-  PWM0_1_CMPA_R = PWM_PERIOD - (duty - 1);
+	PWM0_1_CMPA_R = PWM_PERIOD - (duty - 1);
 }
 
 // Set duty cycle for phase C
 void set_duty_c(uint16_t duty){
-  PWM1_3_CMPA_R = PWM_PERIOD - (duty - 1);
+	PWM1_3_CMPA_R = PWM_PERIOD - (duty - 1);
 }
 
 // Update range factor 0 <= f <= 1, factor of RANGE_FACTOR_MAX

@@ -117,7 +117,7 @@ void ADC_In(int data[9]){
 	*/
 double ADC_Calib (int choice){
 	double retValue = 0;
-	int tempData = 0;
+	volatile int tempData = 0;
 	int data[9] = {0};
 	ADC_In(data);
 	tempData = data[choice];

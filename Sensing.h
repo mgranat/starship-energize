@@ -72,21 +72,21 @@ void ADC_Print(int setup);
 	Input: none
 	Output: 0 if no error, 1 if error
 	*/
-int error();
+int error(void);
 
 /***********getPvPower*************
 	returns power from the PV sensing side, PV Voltage * DC Current
 	Input: none
 	Output: double value, no truncation
 	*/
-double getPvPower();
+double getPvPower(void);
 
 /***********getPvVoltage*************
 	returns voltage from the PV sensing side
 	Input: none
 	Output: double value, no truncation
 	*/
-double getPvVoltage();
+double getPvVoltage(void);
 
 /***********getAcPower*************
 	returns power from the AC sensing side 
@@ -94,7 +94,7 @@ double getPvVoltage();
 	Input: none
 	Output: double value, no truncation
 	*/
-double getAcPower();
+double getAcPower(void);
 
 /***********getDcConverterVoltage*************
 	returns voltage from the DC converter side
@@ -102,5 +102,5 @@ double getAcPower();
 	Output: double value, no truncation
 	*/
 
-double getDcConverterVoltage();
+double getDcConverterVoltage(void);
 
